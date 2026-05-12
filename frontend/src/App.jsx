@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import './App.css'
 
 function App() {
@@ -8,11 +8,15 @@ function App() {
 
   const API_URL = '/api/tasks'
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
 
     try {
 
       const response = await fetch(API_URL)
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tasks')
+      }
 
       const data = await response.json()
 
@@ -22,11 +26,12 @@ function App() {
 
       console.error(error)
     }
-  }
+
+  }, [API_URL])
 
   useEffect(() => {
     fetchTasks()
-  }, [])
+  }, [fetchTasks])
 
   const addTask = async () => {
 
@@ -45,6 +50,10 @@ function App() {
         })
       })
 
+      if (!response.ok) {
+        throw new Error('Failed to add task')
+      }
+
       const createdTask = await response.json()
 
       setTasks(prevTasks => [...prevTasks, createdTask])
@@ -61,11 +70,17 @@ function App() {
 
     try {
 
-      await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE'
       })
 
-      setTasks(tasks.filter(task => task.id !== id))
+      if (!response.ok) {
+        throw new Error('Failed to delete task')
+      }
+
+      setTasks(prevTasks =>
+        prevTasks.filter(task => task.id !== id)
+      )
 
     } catch (error) {
 
@@ -77,12 +92,16 @@ function App() {
 
     try {
 
-      await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}/${id}`, {
         method: 'PUT'
       })
 
-      setTasks(
-        tasks.map(task =>
+      if (!response.ok) {
+        throw new Error('Failed to update task')
+      }
+
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
           task.id === id
             ? { ...task, isCompleted: !task.isCompleted }
             : task
