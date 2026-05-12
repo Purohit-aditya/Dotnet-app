@@ -8,10 +8,6 @@ function App() {
 
   const API_URL = '/api/tasks'
 
-  useEffect(() => {
-    fetchTasks()
-  }, [])
-
   const fetchTasks = async () => {
 
     try {
@@ -27,6 +23,10 @@ function App() {
       console.error(error)
     }
   }
+
+  useEffect(() => {
+    fetchTasks()
+  }, [])
 
   const addTask = async () => {
 
@@ -100,7 +100,7 @@ function App() {
 
       <div className="card">
 
-        <h1>To-DO </h1>
+        <h1>To-DO</h1>
 
         <div className="input-group">
 
